@@ -1,5 +1,5 @@
 ﻿using SocialMediaAgent.Models.Request;
-using SocialMediaAgent.Services.Interfaces;
+using SocialMediaAgent.Repositories.Interfaces;
 using System.Text;
 using System.Text.Json;
 

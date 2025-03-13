@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialMediaAgent.Models.Request;
-using SocialMediaAgent.Services.Interfaces;
+using SocialMediaAgent.Repositories.Interfaces;
 
 namespace SocialMediaAgent.Controllers
 {

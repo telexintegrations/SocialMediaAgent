@@ -1,6 +1,6 @@
 ﻿using SocialMediaAgent.Models.Request;
 
-namespace SocialMediaAgent.Services.Interfaces
+namespace SocialMediaAgent.Repositories.Interfaces
 {
     public interface IGroqService
     {
