@@ -21,7 +21,7 @@ namespace SocialMediaAgent.Controllers
             return Ok("This Api is Active");
         }
 
-        [HttpGet("tick")]
+        [HttpGet("integration.json")]
         public async Task<IActionResult> GetTelexConfig()
         {
             var result = await _telex.GetTelexConfig();

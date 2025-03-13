@@ -51,26 +51,4 @@ namespace SocialMediaAgent.Models.Response
         [JsonProperty("default")]
         public string Default { get; set; }
     }
-
-    //public class FaqPair
-    //{
-    //    public string Question { get; set; }
-    //    public string Answer { get; set; }
-    //}
-
-    //public class TelexRequest
-    //{
-    //    public string channel_id { get; set; }
-
-    //    public List<Setting> Settings { get; set; }
-
-    //    public string Message { get; set; }
-    //}
-    //public class TelexResponse
-    //{
-    //    public string EventName { get; set; }
-    //    public string Message { get; set; }
-    //    public string Status { get; set; }
-    //    public string Username { get; set; }
-    //}
 }
