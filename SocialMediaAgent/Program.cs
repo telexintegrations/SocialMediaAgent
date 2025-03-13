@@ -1,6 +1,5 @@
 using SocialMediaAgent.Repositories.Implementation;
 using SocialMediaAgent.Repositories.Interfaces;
-using SocialMediaAgent.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ITelex, TelexRepository>();
+builder.Services.AddScoped<ITelexService, TelexRepository>();
 builder.Services.AddScoped<IGroqService, GroqService>();
 builder.Services.AddHttpClient<IGroqService, GroqService>();
 
