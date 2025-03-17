@@ -14,15 +14,22 @@ builder.Services.AddScoped<ITelexService, TelexRepository>();
 builder.Services.AddScoped<IGroqService, GroqService>();
 builder.Services.AddHttpClient<IGroqService, GroqService>();
 
+builder.Services.AddCors(
+    opts => opts.AddPolicy("AllowAll", builder => {
+        builder.AllowAnyOrigin();
+        builder.AllowAnyHeader();
+        builder.AllowAnyMethod();
+    }
+));
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
