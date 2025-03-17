@@ -19,6 +19,8 @@ namespace SocialMediaAgent.Repositories.Implementation
             _configuration = configuration;
             _groqService = groqService;
         }
+
+        //TO send direct message to telex.
         public async Task<bool> SendMessageToTelex(string channelId, GroqPromptRequest promptRequest)
         {
             try{
@@ -48,10 +50,85 @@ namespace SocialMediaAgent.Repositories.Implementation
                 return false;
             }
         }
+        public async Task<bool> BingTelex(TelexRequest telexRequest)
+        {
+            if(string.IsNullOrEmpty(telexRequest.Settings.Select(m => m.Default).First()))
+            {
+                return false;
+            }
+
+            try{
+                WriteToFile(telexRequest);
+                var groqResponse = await _groqService.GenerateSocialMediaPost(new GroqPromptRequest{ Prompt = telexRequest.Message});
+                TelexMessageResponse telexMessageResponse = new();
+                
+                if(groqResponse.ToLower().Contains("failed")) //not ideal, fix this.
+                {                    
+                    telexMessageResponse.event_name = "AI Content Generated";
+                    telexMessageResponse.message = "Unable to generate content at this time, try again later";
+                    telexMessageResponse.status = "failed";
+                    telexMessageResponse.username = "AI-Content Generator";
+                }
+                
+                telexMessageResponse.event_name = "AI Content Generated";
+                telexMessageResponse.message = groqResponse;
+                telexMessageResponse.status = "success";
+                telexMessageResponse.username = "SMI Team";
+
+                var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
+                return response.IsSuccessStatusCode ? true : false;               
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public async Task<TelexConfig> GetTelexConfig()
         {
             var telexConfig = _configuration.GetSection("TelexConfig").Get<TelexConfig>();
             return telexConfig;
+        }
+
+        public bool Test(TelexRequest req)
+        {
+            try{
+                WriteToFile(req);
+                return true;
+
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public static void WriteToFile(TelexRequest req)
+        {
+            string logDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+            if(!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+            
+            string filepath = Path.Combine(logDirectory, "log.txt");
+
+            if (!File.Exists(filepath))
+            {
+                using (StreamWriter sw = File.CreateText(filepath))
+                {
+                    sw.WriteLine(DateTime.Now + " :: " + req.Settings[0].Default);
+                }
+            }
+            else
+            {
+                using (StreamWriter sw = File.AppendText(filepath))
+                {
+                    sw.WriteLine(DateTime.Now + " :: " + req.Settings[0].Default);
+                }
+            }
         }
     }
 }
