@@ -1,152 +1,160 @@
+---
+
+# 📢 **Social Media Content Generator**
+
+AI-powered tool to generate and post social media content directly to Telex channels. The system integrates **Groq AI** for content generation and **Telex** for content distribution, enabling businesses to automate the process of creating engaging social media posts.
 
 ---
 
-# Social Media Content Generator
+## 🚀 **Overview**
 
-This project integrates Groq AI and Telex to generate social media posts based on a provided prompt (keyword). It allows users to input prompts in a Telex channel and automatically generate text-based social media posts, including platform-specific formatting, image generation, and content suggestions.
+The **Social Media Content Generator** automates the process of generating social media posts based on user-defined keywords or prompts. This integration uses **Groq AI** for content generation and sends the results to a **Telex channel**. The tool allows users to generate, customize, and post content to various platforms, streamlining social media management.
 
-## Features
+---
 
-### Version 1.0 - Basic Social Media Post Generation with AI Support
-- **Generate social media posts** based on a user-provided prompt (keyword).
-- The content is generated using **Groq AI** and displayed in the Telex channel.
+## ✨ **Features**
 
-### Version 1.1 - AI Content Customization
-- Users can **customize the tone**, **style**, **target audience**, and **post purpose** of the generated content to tailor it to their brand.
+✅ **Groq AI Integration** - Automatically generates social media content based on a user-provided prompt (e.g., "Product Launch Announcement").  
+✅ **Telex Channel Integration** - Sends the generated content to a Telex channel for easy sharing and management.  
+✅ **Customizable AI Content** - Users can specify the tone, style, audience, and purpose for more tailored social media posts.  
+✅ **Content Preview** - A preview of generated posts is displayed in the Telex channel before posting.  
+✅ **Error Handling** - The system handles errors like empty or invalid prompts and notifies users accordingly.  
 
-### Version 1.2 - Platform-Specific Formatting
-- Automatically formats generated content for different platforms like **Twitter**, **Instagram**, **LinkedIn**, and **Facebook**.
-- Previews the content to ensure it matches the platform’s requirements.
+---
 
-### Version 1.3 - Post Scheduling Within Telex
-- Schedule AI-generated posts for **future publication** within Telex, allowing users to manage content in advance.
+## 📌 **Tech Stack**
 
-### Version 1.4 - AI Image Generation
-- Generate **AI-generated images** alongside the text for social media posts to align with your company’s branding and style.
+- **Backend**: ASP.NET Core, C#
+- **API & Integration**: Groq API, Telex API
+- **HTTP Client**: `HttpClient` for external requests
+- **Configuration**: `appsettings.json` for app settings and API configurations
 
-### Version 1.5 - Combined AI Content & Image Generation
-- Generate **AI content** and the **corresponding image** together for a complete social media post.
-- Users can preview the post before publishing.
+---
 
-### Version 1.6 - AI-Driven Content Suggestions
-- Provides **AI-powered content recommendations** based on seasonality, current events, and trending topics to help users create relevant and engaging posts.
+## 🛠 **Installation Guide**
 
-## Prerequisites
-
-Before running the project, make sure you have the following:
-
-- .NET 6 or higher
-- Visual Studio or Visual Studio Code
-- A valid **Groq API key** for content generation
-- A **Telex Webhook URL** for sending messages to Telex channels
-
-## Setup Instructions
-
-### Clone the Repository
-Clone the repository to your local machine using the following command:
+### 1️⃣ **Clone the Repository**
 
 ```bash
-git clone https://github.com/yourusername/social-media-content-generator.git
+git clone https://github.com/your-username/social-media-content-generator.git
+cd social-media-content-generator
 ```
 
-### Install Dependencies
-Navigate to the project directory and run the following command to restore the required packages:
+### 2️⃣ **Install Dependencies**
+
+Restore and install the required dependencies:
 
 ```bash
 dotnet restore
 ```
 
-### Configure Settings
-1. Open the `appsettings.json` file.
-2. Add your **Groq API key** and **Telex Settings with the Webhook URL**.
+### 3️⃣ **Set Up AppSettings**
 
-Example:
+In the `appsettings.json` file, add the following sections for **Groq API** and **Telex** integration settings:
+
 ```json
 {
   "GroqConfig": {
-    "ApiKey": "your-groq-api-key",
-    "ApiUrl": "https://api.groq.com/openai/v1/chat/completions"
+    "ApiKey": "your_groq_api_key", // Add your Groq API key here
+    "ApiUrl": "https://api.groq.com/openai/v1/chat/completions" // The Groq API URL
   },
   "TelexConfig": {
     "data": {
-      "target_url": "your-telex-webhook-url"
+      "target_url": "your_telex_webhook_url" // Add your Telex webhook URL here
     }
   }
 }
 ```
 
-### Run the Application
-After configuring the settings, you can run the application locally:
+- Replace `"your_groq_api_key"` with your actual Groq API key.
+- Replace `"your_telex_webhook_url"` with the **Telex webhook URL** where the generated content will be sent.
+
+### 4️⃣ **Telex Integration Setup**
+
+To complete the **Telex** integration:
+
+- Add the **URL of your deployed app** (which will contain the `integration.json`) to the **Telex channel** configuration.
+- Ensure that the **Webhook URL** from Telex is added to the `target_url` in the `TelexConfig` section of your `appsettings.json`.
+- Specify the **number of responses** you want from the AI directly in the request or configuration.
+
+### 5️⃣ **Start the Application**
+
+Run the following command to start the application:
 
 ```bash
 dotnet run
 ```
 
-The application will start, and you can access it through `https://localhost:5001`.
+---
 
-## API Endpoints
+## 👨‍💻 **Usage**
 
-### **Generate Post**
-Generates a social media post based on the provided prompt.
-
-**Endpoint**: `POST /generate-post`
-
-**Request Body**:
-```json
-{
-  "prompt": "Product Launch Announcement"
-}
-```
-
-**Response**:
-```json
-{
-  "postContent": "Here are some recent product launch announcements:..."
-}
-```
-
-### **Send Message to Telex**
-Sends the generated content to a specified Telex channel.
-
-**Endpoint**: `POST /BingTelex`
-
-**Request Body**:
-```json
-{
-  "channelId": "your-channel-id",
-  "promptRequest": {
-    "prompt": "Product Launch Announcement"
-  }
-}
-```
-
-**Response**:
-```json
-{
-  "status": "success",
-  "message": "Social media content sent to Telex successfully"
-}
-```
-
-## Contributing
-
-We welcome contributions from the community! To contribute:
-
-1. Fork the repository.
-2. Create a new branch for your feature or fix.
-3. Make your changes and test them.
-4. Submit a pull request with a detailed description of the changes.
-
-Please ensure that your code follows the existing style and conventions used in the project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Generate Social Media Post**: To generate a post, send a request with a prompt (e.g., `/generate-post "Product Launch Announcement"`) to the Telex channel.
+- **Schedule Posts**: You can schedule posts for future publication within the Telex channel using specific commands and set times.
+- **Customize Content**: Specify tone, style, audience, and post purpose to generate customized content for your social media.
 
 ---
 
-### Additional Notes:
-- **Customizable Features**: Users can provide specific settings such as tone, style, and platform type for more customized social media posts.
-- **Error Handling**: The system handles errors such as empty prompts or failed content generation and informs users accordingly.
-- **Preview Mode**: Users can preview generated posts before sending them to Telex, ensuring the final product meets their needs.
+## 📂 **Folder Structure**
+
+```
+├── Controllers
+│   ├── TelexController.cs
+│   └── GroqController.cs
+├── Models
+│   ├── Request
+│   │   └── GroqPromptRequest.cs
+│   ├── Response
+│   │   └── TelexMessageResponse.cs
+├── Repositories
+│   ├── Interfaces
+│   │   └── ITelexService.cs
+│   └── Implementation
+│       └── TelexRepository.cs
+├── Services
+│   └── GroqService.cs
+└── appsettings.json
+```
+
 ---
+
+## 🔧 **Contributing**
+
+1. **Fork the Repository**  
+   Fork the project repository to your own GitHub account.
+
+2. **Create a Branch**  
+   Create a new branch for your feature or bugfix:
+
+   ```bash
+   git checkout -b feature/branch-name
+   ```
+
+3. **Commit Changes**  
+   Commit your changes with descriptive messages:
+
+   ```bash
+   git commit -m "Added new feature"
+   ```
+
+4. **Push Changes**  
+   Push the changes to your forked repository:
+
+   ```bash
+   git push origin feature/branch-name
+   ```
+
+5. **Create a Pull Request**  
+   Open a pull request (PR) to the original repository from your fork.
+
+---
+
+## 🙋‍♂️ **Questions or Issues?**
+
+Feel free to reach out with any questions or open an issue if something isn't working as expected.
+
+---
+
+### Notes:
+- This README outlines the setup and integration steps for a project that automatically generates and posts social media content using **Groq AI** and **Telex** integration.
+- It includes instructions for setting up the **Groq API** and **Telex Webhook**, which are crucial for the system to work correctly.
