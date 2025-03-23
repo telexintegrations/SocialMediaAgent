@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Repositories.Interfaces;
+using SocialMediaAgent.Utils;
 
 namespace SocialMediaAgent.Controllers
 {
@@ -30,20 +31,21 @@ namespace SocialMediaAgent.Controllers
         }
 
         [HttpPost("BingTelex")]
-        public async Task<ActionResult> BingTelex(TelexRequest telexRequest)
+        public async Task<IActionResult> BingTelex(TelexRequest telexRequest)
         {
+            LogTelexResponse.WriteToFile(telexRequest);
             if(telexRequest == null)
             {
                 return StatusCode(400, "payload required");
             }
 
             var response = await _telexService.BingTelex(telexRequest);
-            if(response)
-            {
-                return StatusCode(202,"Social Media content sent to telex succesfully");
-            }
+            // if(response)
+            // {
+            //     return StatusCode(200,"Social Media content sent to telex succesfully");
+            // }
 
-            return StatusCode(400, "Unable to send message to telex");
+            return StatusCode(202, response);
         }
 
         //TODO:: implement service to send direct message to telex channel
