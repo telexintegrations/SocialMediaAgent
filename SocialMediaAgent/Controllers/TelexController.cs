@@ -60,17 +60,18 @@ namespace SocialMediaAgent.Controllers
                 return BadRequest("Post content is required.");
             }
 
-            // Schedule the post using the PostSchedulingService
+
+            // Call the SchedulePost method from PostSchedulingService
             var result = await _postSchedulingService.SchedulePost(scheduledPostRequest);
+
             if (result)
             {
-                return Ok("Post has been successfully scheduled.");
+                return StatusCode(202, "Post has been scheduled successfully.");
             }
 
-            return StatusCode(500, "Failed to schedule post.");
+            return StatusCode(400, "Unable to schedule the post.");
         }
 
     }
 }
-
         // TODO: implement service to send direct message to Telex channel

@@ -2,8 +2,8 @@
 {
     public class ScheduledPostRequest
     {
-        public string PostContent { get; set; } // The content of the post
-        public DateTime ScheduledTime { get; set; } // The time the post should be published
-        public string Platform { get; set; } // The platform the post is targeted for (e.g., Twitter, Instagram)
+        public string PostContent { get; set; } // Content of the post to be scheduled
+        public string ChannelId { get; set; }   // The ID of the Telex channel where the post will be sent
+        public DateTime ScheduledTime { get; set; } // The time at which the post should be sent
     }
 }
