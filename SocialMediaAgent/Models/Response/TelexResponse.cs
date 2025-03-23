@@ -3,7 +3,7 @@ namespace SocialMediaAgent.Models.Response{
     {
         public string event_name{get; set;}
         public string message{get; set;}
-        public string status{get; set;}
-        public string username{get; set;}
+        public string status{get; set;} = "success";
+        public string username{get; set;} = "SMI Team";
     }
 }
