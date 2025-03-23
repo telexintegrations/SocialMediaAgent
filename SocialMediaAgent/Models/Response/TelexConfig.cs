@@ -18,8 +18,8 @@ namespace SocialMediaAgent.Models.Response
         public List<string> key_features { get; set; } = new List<string>();
         public List<Setting> settings { get; set; } = new List<Setting>();
         public string target_url { get; set; }
-        public string tick_url { get; set; }
-        public string website    { get; set; }
+        //public string tick_url { get; set; }
+        //public string website    { get; set; }
     }
 
     public class Date
@@ -50,5 +50,8 @@ namespace SocialMediaAgent.Models.Response
 
         [JsonProperty("default")]
         public string Default { get; set; }
+
+        [JsonProperty("options")]
+        public List<string> Options { get; set; } = new List<string>();
     }
 }
