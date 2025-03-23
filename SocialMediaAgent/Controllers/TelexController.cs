@@ -36,6 +36,10 @@ namespace SocialMediaAgent.Controllers
             {
                 return StatusCode(400, "payload required");
             }
+            if (telexRequest.Message.Contains("#groq") || telexRequest.Message.Contains("#SMI_DEVS"))
+            {
+                return StatusCode(400, "Message Already processed.");
+            }
 
             var response = await _telexService.BingTelex(telexRequest);
             if(response)
