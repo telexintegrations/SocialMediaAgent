@@ -1,8 +1,9 @@
-﻿using System.Text;
-using System.Text.Json;
-using SocialMediaAgent.Models.Request;
+﻿using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Models.Response;
 using SocialMediaAgent.Repositories.Interfaces;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SocialMediaAgent.Repositories.Implementation
 {
@@ -12,6 +13,7 @@ namespace SocialMediaAgent.Repositories.Implementation
         private readonly HttpClient _httpClient;
         private readonly string _telexWebhookUrl;
         private readonly IGroqService _groqService;
+
         public TelexRepository(HttpClient httpClient, IConfiguration configuration, IGroqService groqService)
         {
             _httpClient = httpClient;
@@ -20,7 +22,7 @@ namespace SocialMediaAgent.Repositories.Implementation
             _groqService = groqService;
         }
 
-        //TO send direct message to telex.
+        // Send direct message to Telex
         public async Task<bool> SendMessageToTelex(string channelId, GroqPromptRequest promptRequest)
         {
             try
@@ -39,6 +41,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 telexMessageResponse.message = groqResponse;
                 telexMessageResponse.status = "success";
                 telexMessageResponse.username = "SMI Team";
+            }
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -250,6 +253,7 @@ namespace SocialMediaAgent.Repositories.Implementation
             }
         }
 
+        // Utility method to write request info to a log file
         public static void WriteToFile(TelexRequest req)
         {
             string logDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Logs");

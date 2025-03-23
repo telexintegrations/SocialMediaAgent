@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Repositories.Interfaces;
+using SocialMediaAgent.Services; // Ensure to include this namespace for PostSchedulingService
+using System;
 
 namespace SocialMediaAgent.Controllers
 {
@@ -10,16 +12,19 @@ namespace SocialMediaAgent.Controllers
     public class TelexController : ControllerBase
     {
         private readonly ITelexService _telexService;
+        private readonly PostSchedulingService _postSchedulingService; // Inject the PostSchedulingService
 
-        public TelexController(ITelexService telex)
+        public TelexController(ITelexService telex, PostSchedulingService postSchedulingService)
         {
             _telexService = telex;
+            _postSchedulingService = postSchedulingService; // Inject the PostSchedulingService here
         }
+
         [HttpGet]
         public IActionResult Post()
         {
             // Send message to Telex
-            return Ok("This Api is Active");
+            return Ok("This API is Active");
         }
 
         [HttpGet("integration.json")]
@@ -32,9 +37,9 @@ namespace SocialMediaAgent.Controllers
         [HttpPost("BingTelex")]
         public async Task<ActionResult> BingTelex(TelexRequest telexRequest)
         {
-            if(telexRequest == null)
+            if (telexRequest == null)
             {
-                return StatusCode(400, "payload required");
+                return StatusCode(400, "Payload required");
             }
             if (telexRequest.Message.Contains("#groq") || telexRequest.Message.Contains("#SMI_DEVS"))
             {
@@ -42,14 +47,35 @@ namespace SocialMediaAgent.Controllers
             }
 
             var response = await _telexService.BingTelex(telexRequest);
-            if(response)
+            if (response)
             {
-                return StatusCode(202,"Social Media content sent to telex succesfully");
+                return StatusCode(202, "Social Media content sent to Telex successfully");
             }
 
-            return StatusCode(400, "Unable to send message to telex");
+            return StatusCode(400, "Unable to send message to Telex");
         }
 
-        //TODO:: implement service to send direct message to telex channel
+        // New Endpoint for scheduling posts
+        [HttpPost("schedule-post")]
+        public async Task<IActionResult> SchedulePost(ScheduledPostRequest scheduledPostRequest)
+        {
+            if (scheduledPostRequest == null || string.IsNullOrEmpty(scheduledPostRequest.PostContent))
+            {
+                return BadRequest("Post content is required.");
+            }
+
+
+            // Call the SchedulePost method from PostSchedulingService
+            var result = await _postSchedulingService.SchedulePost(scheduledPostRequest);
+
+            if (result)
+            {
+                return StatusCode(202, "Post has been scheduled successfully.");
+            }
+
+            return StatusCode(400, "Unable to schedule the post.");
+        }
+
     }
 }
+        // TODO: implement service to send direct message to Telex channel
