@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Repositories.Interfaces;
-using SocialMediaAgent.Services; // Ensure to include this namespace for PostSchedulingService
+using SocialMediaAgent.Services;
 using System;
 
 namespace SocialMediaAgent.Controllers
@@ -12,18 +12,17 @@ namespace SocialMediaAgent.Controllers
     public class TelexController : ControllerBase
     {
         private readonly ITelexService _telexService;
-        private readonly PostSchedulingService _postSchedulingService; // Inject the PostSchedulingService
+        private readonly PostSchedulingService _postSchedulingService;
 
         public TelexController(ITelexService telex, PostSchedulingService postSchedulingService)
         {
             _telexService = telex;
-            _postSchedulingService = postSchedulingService; // Inject the PostSchedulingService here
+            _postSchedulingService = postSchedulingService;
         }
 
         [HttpGet]
         public IActionResult Post()
         {
-            // Send message to Telex
             return Ok("This API is Active");
         }
 
@@ -55,7 +54,6 @@ namespace SocialMediaAgent.Controllers
             return StatusCode(400, "Unable to send message to Telex");
         }
 
-        // New Endpoint for scheduling posts
         [HttpPost("schedule-post")]
         public async Task<IActionResult> SchedulePost(ScheduledPostRequest scheduledPostRequest)
         {
@@ -64,8 +62,6 @@ namespace SocialMediaAgent.Controllers
                 return BadRequest("Post content is required.");
             }
 
-
-            // Call the SchedulePost method from PostSchedulingService
             var result = await _postSchedulingService.SchedulePost(scheduledPostRequest);
 
             if (result)
@@ -78,4 +74,3 @@ namespace SocialMediaAgent.Controllers
 
     }
 }
-        // TODO: implement service to send direct message to Telex channel

@@ -1,9 +1,8 @@
-﻿using SocialMediaAgent.Models.Request;
+﻿using System.Text;
+using System.Text.Json;
+using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Models.Response;
 using SocialMediaAgent.Repositories.Interfaces;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SocialMediaAgent.Repositories.Implementation
 {
@@ -13,7 +12,6 @@ namespace SocialMediaAgent.Repositories.Implementation
         private readonly HttpClient _httpClient;
         private readonly string _telexWebhookUrl;
         private readonly IGroqService _groqService;
-
         public TelexRepository(HttpClient httpClient, IConfiguration configuration, IGroqService groqService)
         {
             _httpClient = httpClient;
@@ -22,7 +20,7 @@ namespace SocialMediaAgent.Repositories.Implementation
             _groqService = groqService;
         }
 
-        // Send direct message to Telex
+        //TO send direct message to telex.
         public async Task<bool> SendMessageToTelex(string channelId, GroqPromptRequest promptRequest)
         {
             try
@@ -41,7 +39,6 @@ namespace SocialMediaAgent.Repositories.Implementation
                 telexMessageResponse.message = groqResponse;
                 telexMessageResponse.status = "success";
                 telexMessageResponse.username = "SMI Team";
-            }
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -54,43 +51,6 @@ namespace SocialMediaAgent.Repositories.Implementation
                 return false;
             }
         }
-
-        //public async Task<bool> BingTelex(TelexRequest telexRequest)
-        //{
-        //    if(string.IsNullOrEmpty(telexRequest.Settings.Select(m => m.Default).First()))
-        //    {
-        //        return false;
-        //    }
-
-        //    try{
-        //        WriteToFile(telexRequest);
-        //        var groqResponse = await _groqService.GenerateSocialMediaPost(new GroqPromptRequest{ Prompt = telexRequest.Message});
-        //        TelexMessageResponse telexMessageResponse = new();
-
-        //        if(groqResponse.ToLower().Contains("failed")) //not ideal, fix this.
-        //        {                    
-        //            telexMessageResponse.event_name = "AI Content Generated";
-        //            telexMessageResponse.message = "Unable to generate content at this time, try again later";
-        //            telexMessageResponse.status = "failed";
-        //            telexMessageResponse.username = "AI-Content Generator";
-        //        }
-
-        //        telexMessageResponse.event_name = "AI Content Generated";
-        //        telexMessageResponse.message = groqResponse;
-        //        telexMessageResponse.status = "success";
-        //        telexMessageResponse.username = "SMI Team";
-
-        //        var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
-        //        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-        //        var response = await _httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
-        //        return response.IsSuccessStatusCode ? true : false;               
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        Console.WriteLine(ex.Message);
-        //        return false;
-        //    }
-        //}
 
         public async Task<bool> BingTelex(TelexRequest telexRequest)
         {
@@ -253,7 +213,6 @@ namespace SocialMediaAgent.Repositories.Implementation
             }
         }
 
-        // Utility method to write request info to a log file
         public static void WriteToFile(TelexRequest req)
         {
             string logDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
