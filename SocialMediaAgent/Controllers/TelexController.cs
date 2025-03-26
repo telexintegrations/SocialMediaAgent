@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Repositories.Interfaces;
-using SocialMediaAgent.Utils;
+
 
 namespace SocialMediaAgent.Controllers
 {
@@ -33,7 +33,6 @@ namespace SocialMediaAgent.Controllers
         [HttpPost("BingTelex")]
         public async Task<IActionResult> BingTelex(TelexRequest telexRequest)
         {
-            LogTelexResponse.WriteToFile(telexRequest);
             if(telexRequest == null)
             {
                 return StatusCode(400, "payload required");
