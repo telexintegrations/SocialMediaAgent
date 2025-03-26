@@ -48,7 +48,7 @@ namespace SocialMediaAgent.Controllers
             var response = await _telexService.BingTelex(telexRequest);
             if (response)
             {
-                return StatusCode(202, "Social Media content sent to Telex successfully");
+                return StatusCode(202, "Message has been sent to Telex successfully");
             }
 
             return StatusCode(400, "Unable to send message to Telex");
