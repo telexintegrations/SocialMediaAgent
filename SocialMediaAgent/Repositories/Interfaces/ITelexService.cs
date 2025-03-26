@@ -7,6 +7,6 @@ namespace SocialMediaAgent.Repositories.Interfaces
     {
         Task<TelexConfig> GetTelexConfig();
         Task<bool> SendMessageToTelex(string channelId, GroqPromptRequest promptRequest);
-        Task<TelexMessageResponse> BingTelex(TelexRequest request);
+        Task<bool> BingTelex(TelexRequest request);
     }
 }
