@@ -5,7 +5,6 @@ using SocialMediaAgent.Repositories.Interfaces;
 using SocialMediaAgent.Services;
 using System;
 
-
 namespace SocialMediaAgent.Controllers
 {
     [Route("")]
@@ -35,7 +34,7 @@ namespace SocialMediaAgent.Controllers
         }
 
         [HttpPost("BingTelex")]
-        public async Task<IActionResult> BingTelex(TelexRequest telexRequest)
+        public async Task<ActionResult> BingTelex(TelexRequest telexRequest)
         {
             if (telexRequest == null)
             {
@@ -46,11 +45,10 @@ namespace SocialMediaAgent.Controllers
                 return StatusCode(400, "Message Already processed.");
             }
 
-            var response = await _telexService.BingTelex(telexRequest);            
-
+            var response = await _telexService.BingTelex(telexRequest);
             if (response)
             {
-                return StatusCode(202, "Social Media content sent to Telex successfully");
+                return StatusCode(202, "Message has been sent to Telex successfully");
             }
 
             return StatusCode(400, "Unable to send message to Telex");
