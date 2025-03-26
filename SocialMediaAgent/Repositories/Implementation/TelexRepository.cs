@@ -125,7 +125,5 @@ namespace SocialMediaAgent.Repositories.Implementation
             var telexConfig = _configuration.GetSection("TelexConfig").Get<TelexConfig>();
             return telexConfig;
         }
-
-        
     }
 }

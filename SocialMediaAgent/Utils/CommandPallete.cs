@@ -24,12 +24,12 @@ namespace SocialMediaAgent.Utils{
                 if(groqResponse.ToLower().Contains("failed")) //not ideal, fix this.
                 {                    
                     telexMessageResponse.event_name = "AI Content Generated";
-                    telexMessageResponse.message = "Unable to generate content at this time, try again later.\n#SMI_DEVS";
+                    telexMessageResponse.message = "Unable to generate content at this time, try again later.\n\n #SMA_DEVS";
                     telexMessageResponse.status = "failed";
                 }
                 
                 telexMessageResponse.event_name = "AI Content Generated";
-                telexMessageResponse.message = $"{groqResponse}\n#groq";
+                telexMessageResponse.message = $"{groqResponse}\n\n #?SOCIALMEDIAAGENT";
                 telexMessageResponse.status = "success";
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
