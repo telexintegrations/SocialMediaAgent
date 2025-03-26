@@ -120,13 +120,11 @@ namespace SocialMediaAgent.Repositories.Implementation
         }
 
 
-
         public async Task<TelexConfig> GetTelexConfig()
         {
             var telexConfig = _configuration.GetSection("TelexConfig").Get<TelexConfig>();
             return telexConfig;
         }
-
-        
     }
+
 }

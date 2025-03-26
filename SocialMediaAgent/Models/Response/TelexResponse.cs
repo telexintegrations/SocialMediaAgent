@@ -1,4 +1,5 @@
-namespace SocialMediaAgent.Models.Response{
+namespace SocialMediaAgent.Models.Response
+{
     public class TelexMessageResponse
     {
         public string event_name{get; set;}
