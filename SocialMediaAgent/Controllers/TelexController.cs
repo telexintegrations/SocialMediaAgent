@@ -40,7 +40,7 @@ namespace SocialMediaAgent.Controllers
             {
                 return StatusCode(400, "Payload required");
             }
-            if (telexRequest.Message.Contains("#️SOCIALMEDIAAGENT") || telexRequest.Message.Contains("#SMA_DEVS"))
+            if (telexRequest.Message.Contains("#️⃣SocialMediaAgent"))
             {
                 return StatusCode(400, "Message Already processed.");
             }

@@ -38,9 +38,9 @@ namespace SocialMediaAgent.Repositories.Implementation
                 }
 
                 telexMessageResponse.event_name = "AI Content Generated";
-                telexMessageResponse.message = groqResponse;
+                telexMessageResponse.message = $"{groqResponse} \n\n #️⃣SocialMediaAgent";
                 telexMessageResponse.status = "success";
-                telexMessageResponse.username = "SMI Team";
+                telexMessageResponse.username = "Social Media Agent";
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -75,7 +75,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 {
                     telexRequest.Settings.First().Label = "Command needed";
                     telexRequest.Message = @"Hello, keyword command not specified.
-                    type /commands to see the list of avaliable commands. #SMA_DEVS";
+                    type /commands to see the list of avaliable commands. #️⃣SocialMediaAgent";
 
                     var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
                     CustomLogger.WriteToFile("Command not selected ", telexRequest);
@@ -87,7 +87,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 if (string.IsNullOrEmpty(platform))
                 {
                     telexRequest.Settings.First().Label = "Platform Selection Needed";
-                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.#SMA_DEVS";
+                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
                     var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
 
                     CustomLogger.WriteToFile("platform not selceted", new TelexRequest
