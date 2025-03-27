@@ -75,7 +75,7 @@ To complete the **Telex** integration:
 
 - Add the **URL of your deployed app** (which will contain the `integration.json`) to the **Telex channel** configuration.
 - Ensure that the **Webhook URL** from Telex is added to the `target_url` in the `TelexConfig` section of your `appsettings.json`.
-- Specify the **number of responses** you want from the AI directly in the request or configuration.
+- Specify the **platform** you want to post your generated content from the AI directly in the request or configuration.
 
 ### 5️⃣ **Start the Application**
 
