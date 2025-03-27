@@ -21,7 +21,7 @@ namespace SocialMediaAgent.Utils{
                 var groqResponse = await groqService!.GenerateSocialMediaPost(new GroqPromptRequest{ Prompt = telexRequest.Message});
                 TelexMessageResponse telexMessageResponse = new();
                 
-                if(groqResponse.ToLower().Contains("failed")) //not ideal, fix this.
+                if(groqResponse.ToLower().Contains("failed"))
                 {                    
                     telexMessageResponse.event_name = "AI Content Generated";
                     telexMessageResponse.message = "Unable to generate content at this time, try again later.\n\n #SMA_DEVS";
@@ -75,7 +75,7 @@ namespace SocialMediaAgent.Utils{
                     Here are the list of available commands:
                                        
                     {string.Join("\n", Commands.Keys)}
-                    #SMI_DEVS",
+                    #SMA_DEVS",
                     status = "success"
                 };
 
