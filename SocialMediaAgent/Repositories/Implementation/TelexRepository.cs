@@ -40,7 +40,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 telexMessageResponse.event_name = "AI Content Generated";
                 telexMessageResponse.message = groqResponse;
                 telexMessageResponse.status = "success";
-                telexMessageResponse.username = "SMI Team";
+                telexMessageResponse.username = "Social Media Agent";
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
