@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Models.Response;
@@ -24,12 +24,12 @@ namespace SocialMediaAgent.Utils{
                 if(groqResponse.ToLower().Contains("failed"))
                 {                    
                     telexMessageResponse.event_name = "AI Content Generated";
-                    telexMessageResponse.message = "Unable to generate content at this time, try again later.\n\n #SMA_DEVS";
+                    telexMessageResponse.message = "Unable to generate content at this time, try again later.\n\n #️⃣SocialMediaAgent";
                     telexMessageResponse.status = "failed";
                 }
                 
                 telexMessageResponse.event_name = "AI Content Generated";
-                telexMessageResponse.message = $"{groqResponse}\n\n #?SOCIALMEDIAAGENT";
+                telexMessageResponse.message = $"{groqResponse}\n\n #️⃣SocialMediaAgent";
                 telexMessageResponse.status = "success";
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
@@ -74,8 +74,8 @@ namespace SocialMediaAgent.Utils{
                     message = @$"Hello there!
                     Here are the list of available commands:
                                        
-                    {string.Join("\n", Commands.Keys)}
-                    #SMA_DEVS",
+                    {string.Join("\n\n", Commands.Keys)}
+                    #️⃣SocialMediaAgent",
                     status = "success"
                 };
 
