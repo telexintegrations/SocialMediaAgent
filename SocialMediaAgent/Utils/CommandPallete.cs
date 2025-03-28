@@ -18,7 +18,7 @@ namespace SocialMediaAgent.Utils{
             try{
                 var platform = telexRequest!.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
                 var fullPrompt = FormatPromptWithPlatform(telexRequest.Message, platform!);
-                var groqResponse = await groqService!.GenerateSocialMediaPost(new GroqPromptRequest{ Prompt = telexRequest.Message});
+                var groqResponse = await groqService!.GenerateSocialMediaPost(new GroqPromptRequest{ Prompt = fullPrompt});
                 TelexMessageResponse telexMessageResponse = new();
                 
                 if(groqResponse.ToLower().Contains("failed"))
