@@ -32,11 +32,8 @@ namespace SocialMediaAgent.Utils{
                 telexMessageResponse.message = $"{groqResponse}\n\n #️⃣SocialMediaAgent";
                 telexMessageResponse.status = "success";
 
-                var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
-                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync($"{telexRequest.Settings.First().Default}", content);
-
-                return response.IsSuccessStatusCode ? true : false;
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, telexRequest.Settings.First().Default);
+                return clientResponse.IsSuccessStatusCode ? true : false;
                 
             }catch(Exception ex)
             {
@@ -55,11 +52,8 @@ namespace SocialMediaAgent.Utils{
                     status = "error"
                 };
 
-                var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
-                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
-
-                return response.IsSuccessStatusCode ? true : false;
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, telexRequest.Settings.First().Default);
+                return clientResponse.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)
             {
                 CustomLogger.WriteToFile(ex.Message, telexRequest);
@@ -74,7 +68,7 @@ namespace SocialMediaAgent.Utils{
                     message = @$"Hello there!
                     Here are the list of available commands:
                                        
-                    {string.Join("\n\n", Commands.Keys)}
+                    {string.Join("\n", Commands.Keys)}
                     #️⃣SocialMediaAgent",
                     status = "success"
                 };
