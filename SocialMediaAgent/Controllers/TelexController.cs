@@ -45,7 +45,7 @@ namespace SocialMediaAgent.Controllers
                 return StatusCode(400, "Message Already processed.");
             }
 
-            var response = await _telexService.BingTelex(telexRequest);
+            var response = await _telexService.RoutePrompt(telexRequest);
             if (response)
             {
                 return StatusCode(202, "Message has been sent to Telex successfully");
