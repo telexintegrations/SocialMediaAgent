@@ -36,9 +36,13 @@ namespace SocialMediaAgent.Controllers
         [HttpPost("BingTelex")]
         public async Task<ActionResult> BingTelex(TelexRequest telexRequest)
         {
-            if (telexRequest == null)
+            if (telexRequest == null || string.IsNullOrEmpty(telexRequest.Message))
             {
                 return StatusCode(400, "Payload required");
+            }
+            if (string.IsNullOrEmpty(telexRequest.ChannelId))
+            {
+                return StatusCode(400, "Channel ID is required.");
             }
             if (telexRequest.Message.Contains("#️⃣SocialMediaAgent"))
             {

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Models.Response;
 using SocialMediaAgent.Repositories.Implementation;
@@ -37,6 +38,9 @@ namespace SocialMediaAgent.Utils{
                 var response = await httpClient.PostAsync($"{telexRequest.Settings.First().Default}", content);
 
                 return response.IsSuccessStatusCode ? true : false;
+                var channelUrl = $"https://ping.telex.im/v1/webhooks/{telexRequest.ChannelId}";
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, channelUrl);
+                return clientResponse.IsSuccessStatusCode ? true : false;
                 
             }catch(Exception ex)
             {
@@ -60,6 +64,10 @@ namespace SocialMediaAgent.Utils{
                 var response = await httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
 
                 return response.IsSuccessStatusCode ? true : false;
+                var channelUrl = $"https://ping.telex.im/v1/webhooks/{telexRequest.ChannelId}";
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, channelUrl);
+
+                return clientResponse.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)
             {
                 CustomLogger.WriteToFile(ex.Message, telexRequest);
@@ -81,7 +89,8 @@ namespace SocialMediaAgent.Utils{
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
+                var channelUrl = $"https://ping.telex.im/v1/webhooks/{telexRequest.ChannelId}";
+                var response = await httpClient.PostAsync($"{channelUrl}", content);
 
                 return response.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)

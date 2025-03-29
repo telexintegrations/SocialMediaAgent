@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Channels;
 using SocialMediaAgent.Models.Request;
 using SocialMediaAgent.Models.Response;
 using SocialMediaAgent.Repositories.Interfaces;
@@ -44,7 +45,9 @@ namespace SocialMediaAgent.Repositories.Implementation
 
                 var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"{_telexWebhookUrl}/{channelId}", content);
+
+                var channelUrl = $"https://ping.telex.im/v1/webhooks/{channelId}";
+                var response = await _httpClient.PostAsync($"{channelUrl}", content);
                 return response.IsSuccessStatusCode ? true : false;
             }
             catch (Exception ex)
@@ -61,23 +64,28 @@ namespace SocialMediaAgent.Repositories.Implementation
                 return false;
             }
 
-            var channelUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
-            telexRequest.Settings.First().Default = channelUrl;
+            CustomLogger.WriteToFile("Telex request received with channel_id: " + telexRequest.ChannelId, telexRequest);
 
             var trimmedMessasge = Regex.Replace(telexRequest.Message, @"<\/?p>", "", RegexOptions.IgnoreCase).Trim();
+            var channelId = telexRequest.ChannelId;
+            var channelUrl = $"https://ping.telex.im/v1/webhooks/{channelId}";
+
+            var trimmedMessasge = RemoveTags(telexRequest.Message);
             var splittedMessage = trimmedMessasge.Split(' ', 2);
             string cmd = splittedMessage.First();
             try
             {
-                CustomLogger.WriteToFile("Telex call to api with request ",telexRequest);
+                CustomLogger.WriteToFile("Telex call to api with request ", telexRequest);
 
-                if(CommandPallete.Commands.TryGetValue(cmd, out var function) == false)
+                if (CommandPallete.Commands.TryGetValue(cmd, out var function) == false)
                 {
                     telexRequest.Settings.First().Label = "Command needed";
                     telexRequest.Message = @"Hello, keyword command not specified.
-                    type /commands to see the list of avaliable commands. #️⃣SocialMediaAgent";
+                    type /commands to see the list of avaliable commands.
+                    
+                    #️⃣SocialMediaAgent";
 
-                    var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
+                    var response = await CommandPallete.SendErrorMessage(_groqService, _httpClient, telexRequest);
                     CustomLogger.WriteToFile("Command not selected ", telexRequest);
                     return response;
                 }
@@ -88,7 +96,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 {
                     telexRequest.Settings.First().Label = "Platform Selection Needed";
                     telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
-                    var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
+                    var response = await CommandPallete.SendErrorMessage(_groqService, _httpClient, telexRequest);
 
                     CustomLogger.WriteToFile("platform not selceted", new TelexRequest
                     {
@@ -109,7 +117,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                     return response;
                 }
 
-                var _isSuccessful = await function(_groqService, _httpClient, telexRequest);                
+                var _isSuccessful = await function(_groqService, _httpClient, telexRequest);
                 return _isSuccessful;
             }
             catch (Exception ex)
@@ -117,6 +125,35 @@ namespace SocialMediaAgent.Repositories.Implementation
                 CustomLogger.WriteToFile(ex.Message, telexRequest);
                 return false;
             }
+        }
+
+        public async Task<bool> RoutePrompt(TelexRequest telexRequest)
+        {
+            var trimmedMessasge = RemoveTags(telexRequest.Message);
+            if (CommandPallete.Commands.Keys.Any(trimmedMessasge.Contains))
+            {
+                var bingReponse = await BingTelex(telexRequest);
+                return bingReponse;
+            }
+
+            trimmedMessasge = $@"prompt: {trimmedMessasge} +  guideline: if the prompt requires generation of a social media content, just greet me and tell me to use 
+            /generate-post command for post generation or use use /commands to see the list of commands for interaction else interact with me normally and tell me what you can do as a Social Media Agent";
+            var groqResponse = await _groqService.GenerateSocialMediaPost(new GroqPromptRequest { Prompt = trimmedMessasge });
+            if (groqResponse.Contains("failed")) //TODO :: add param statuscode to this method for better check rather than the .contains(failed)
+            {
+                return false;
+            }
+
+            var channelUrl = $"https://ping.telex.im/v1/webhooks/{telexRequest.ChannelId}";
+            var telexMessageResponse = new TelexMessageResponse()
+            {
+                event_name = "AI Content Generated",
+                message = $"{groqResponse}\n\n #️⃣SocialMediaAgent",
+                status = "success"
+            };
+
+            var clientResponse = await Client.PostToTelex(_httpClient, telexMessageResponse, channelUrl);
+            return clientResponse.IsSuccessStatusCode ? true : false;
         }
 
 
