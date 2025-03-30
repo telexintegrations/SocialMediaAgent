@@ -83,6 +83,10 @@ namespace SocialMediaAgent.Repositories.Implementation
                 }
 
                 var platform = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
+                var tone = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "tone")?.Default ?? "neutral";
+                var style = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "style")?.Default ?? "standard";
+                var audience = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "audience")?.Default ?? "general";
+                var postPurpose = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "postpurpose")?.Default ?? "informational";
 
                 if (string.IsNullOrEmpty(platform))
                 {
