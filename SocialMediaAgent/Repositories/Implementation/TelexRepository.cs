@@ -87,7 +87,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                 if (string.IsNullOrEmpty(platform))
                 {
                     telexRequest.Settings.First().Label = "Platform Selection Needed";
-                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
+                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, Discord or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
                     var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
 
                     CustomLogger.WriteToFile("platform not selceted", new TelexRequest

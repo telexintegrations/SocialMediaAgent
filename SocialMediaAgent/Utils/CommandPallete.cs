@@ -96,6 +96,8 @@ namespace SocialMediaAgent.Utils{
                 "linkedin" => "Format for LinkedIn with a professional tone, short headline, paragraph, and 1-3 hashtags.",
                 "facebook" => "Format this for Facebook with a short, friendly message and emojis.",
                 "tiktok" => "Format this for TikTok, using an energetic tone, emojis, and 3-5 hashtags. Optionally suggest a video idea.",
+                "Discord" => "Format for Discord with a professional tone, short headline, use emojis, paragraph, and 1-3 hashtags.",
+
                 _ => "Generate a generic social media post."
             };
             return $"{keyword}\n\n{instructions}";
