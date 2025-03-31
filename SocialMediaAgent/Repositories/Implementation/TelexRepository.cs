@@ -13,16 +13,18 @@ namespace SocialMediaAgent.Repositories.Implementation
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly string _telexWebhookUrl;
+        private readonly string _telexPingUrl;
         private readonly IGroqService _groqService;
         public TelexRepository(HttpClient httpClient, IConfiguration configuration, IGroqService groqService)
         {
             _httpClient = httpClient;
             _telexWebhookUrl = configuration["TelexConfig:data:target_url"];
+            _telexPingUrl = configuration.GetValue<string>("TelexPingBaseUrl");
             _configuration = configuration;
             _groqService = groqService;
         }
 
-        //TO send direct message to telex.
+        //TO send direct message to telex. :: deprecated method
         public async Task<bool> SendMessageToTelex(string channelId, GroqPromptRequest promptRequest)
         {
             try
@@ -61,8 +63,8 @@ namespace SocialMediaAgent.Repositories.Implementation
                 return false;
             }
 
-            var channelUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
-            telexRequest.Settings.First().Default = channelUrl;
+            // var channelUrl = telexRequest?.channel_id ?? "0195dc8e-131b-7874-a3b6-a343cc0332f7";
+            telexRequest.Settings.First().Default = _telexPingUrl;
 
             var trimmedMessasge = RemoveTags(telexRequest.Message);
             var splittedMessage = trimmedMessasge.Split(' ', 2);
@@ -83,10 +85,10 @@ namespace SocialMediaAgent.Repositories.Implementation
                 }
 
                 var platform = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
-                var tone = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "tone")?.Default ?? "neutral";
-                var style = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "style")?.Default ?? "standard";
-                var audience = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "audience")?.Default ?? "general";
-                var postPurpose = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "postpurpose")?.Default ?? "informational";
+                // var tone = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "tone")?.Default ?? "neutral";
+                // var style = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "style")?.Default ?? "standard";
+                // var audience = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "audience")?.Default ?? "general";
+                // var postPurpose = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "postpurpose")?.Default ?? "informational";
 
                 if (string.IsNullOrEmpty(platform))
                 {
@@ -104,8 +106,8 @@ namespace SocialMediaAgent.Repositories.Implementation
                             Label = "Platform",
                             Type = "text",
                             Required = false,
-                            Default = "Platform not provided.",
-                            Options = new List<string>()
+                            Default = "Platform not provided."
+                            // Options = new List<string>()
                             }
                         }
                     });
@@ -126,12 +128,13 @@ namespace SocialMediaAgent.Repositories.Implementation
         public async Task<bool> RoutePrompt(TelexRequest telexRequest)
         {
             var trimmedMessasge = RemoveTags(telexRequest.Message);
+            CustomLogger.WriteToFile($"this is the channeID:: '{telexRequest.channel_id}'",telexRequest);
             if(CommandPallete.Commands.Keys.Any(trimmedMessasge.Contains))
             {
                 var bingReponse = await BingTelex(telexRequest);
                 return bingReponse;                
             }
-
+            
             trimmedMessasge = $@"prompt: {trimmedMessasge} +  guideline: if the prompt requires generation of a social media content, just greet me and tell me to use 
             /generate-post command for post generation or use use /commands to see the list of commands for interaction else interact with me normally";
             var groqResponse = await _groqService.GenerateSocialMediaPost(new GroqPromptRequest{Prompt = trimmedMessasge});
@@ -139,8 +142,10 @@ namespace SocialMediaAgent.Repositories.Implementation
             {
                 return false;
             }
+            // var webhookUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
 
-            var webhookUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
+            var channelId = telexRequest?.channel_id ?? "0195dc8e-131b-7874-a3b6-a343cc0332f7";
+            var webhookUrl = _telexPingUrl + channelId;
             var telexMessageResponse = new TelexMessageResponse(){
                 event_name = "AI Content Generated",
                 message = $"{groqResponse}\n\n #️⃣SocialMediaAgent",
