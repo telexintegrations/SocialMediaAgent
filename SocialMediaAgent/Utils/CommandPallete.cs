@@ -37,7 +37,8 @@ namespace SocialMediaAgent.Utils{
                 telexMessageResponse.message = $"{groqResponse}\n\n #️⃣SocialMediaAgent";
                 telexMessageResponse.status = "success";
 
-                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, telexRequest.Settings.First().Default);
+                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return clientResponse.IsSuccessStatusCode ? true : false;
                 
             }catch(Exception ex)
@@ -56,8 +57,8 @@ namespace SocialMediaAgent.Utils{
                     message = telexRequest!.Message,
                     status = "error"
                 };
-
-                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, telexRequest.Settings.First().Default);
+                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return clientResponse.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)
             {
@@ -78,10 +79,8 @@ namespace SocialMediaAgent.Utils{
                     status = "success"
                 };
 
-                var jsonPayload = JsonSerializer.Serialize(telexMessageResponse);
-                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync($"{telexRequest.Settings[0].Default}", content);
-
+                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var response = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return response.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)
             {
