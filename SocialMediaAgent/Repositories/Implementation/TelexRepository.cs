@@ -64,7 +64,7 @@ namespace SocialMediaAgent.Repositories.Implementation
             var channelUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
             telexRequest.Settings.First().Default = channelUrl;
 
-            var trimmedMessasge = Regex.Replace(telexRequest.Message, @"<\/?p>", "", RegexOptions.IgnoreCase).Trim();
+            var trimmedMessasge = RemoveTags(telexRequest.Message);
             var splittedMessage = trimmedMessasge.Split(' ', 2);
             string cmd = splittedMessage.First();
             try
@@ -83,11 +83,15 @@ namespace SocialMediaAgent.Repositories.Implementation
                 }
 
                 var platform = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
+                var tone = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "tone")?.Default ?? "neutral";
+                var style = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "style")?.Default ?? "standard";
+                var audience = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "audience")?.Default ?? "general";
+                var postPurpose = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "postpurpose")?.Default ?? "informational";
 
                 if (string.IsNullOrEmpty(platform))
                 {
                     telexRequest.Settings.First().Label = "Platform Selection Needed";
-                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
+                    telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, Discord or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
                     var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
 
                     CustomLogger.WriteToFile("platform not selceted", new TelexRequest
@@ -119,11 +123,45 @@ namespace SocialMediaAgent.Repositories.Implementation
             }
         }
 
+        public async Task<bool> RoutePrompt(TelexRequest telexRequest)
+        {
+            var trimmedMessasge = RemoveTags(telexRequest.Message);
+            if(CommandPallete.Commands.Keys.Any(trimmedMessasge.Contains))
+            {
+                var bingReponse = await BingTelex(telexRequest);
+                return bingReponse;                
+            }
+
+            trimmedMessasge = $@"prompt: {trimmedMessasge} +  guideline: if the prompt requires generation of a social media content, just greet me and tell me to use 
+            /generate-post command for post generation or use use /commands to see the list of commands for interaction else interact with me normally";
+            var groqResponse = await _groqService.GenerateSocialMediaPost(new GroqPromptRequest{Prompt = trimmedMessasge});
+            if(groqResponse.Contains("failed")) //TODO :: add param statuscode to this method for better check rather than the .contains(failed)
+            {
+                return false;
+            }
+
+            var webhookUrl = telexRequest.Settings.FirstOrDefault()?.Default ?? _telexWebhookUrl;
+            var telexMessageResponse = new TelexMessageResponse(){
+                event_name = "AI Content Generated",
+                message = $"{groqResponse}\n\n #️⃣SocialMediaAgent",
+                status = "success"
+            };
+
+            var clientResponse = await Client.PostToTelex(_httpClient, telexMessageResponse, webhookUrl);
+            return clientResponse.IsSuccessStatusCode ? true : false;
+        }
+
 
         public async Task<TelexConfig> GetTelexConfig()
         {
             var telexConfig = _configuration.GetSection("TelexConfig").Get<TelexConfig>();
-            return telexConfig;
+            return telexConfig; 
+        }
+
+        private string RemoveTags(string message)
+        {
+            var trimmedMessasge = Regex.Replace(message, @"<\/?p>", "", RegexOptions.IgnoreCase).Trim();
+            return trimmedMessasge;
         }
     }
 }
