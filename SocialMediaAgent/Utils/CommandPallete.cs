@@ -8,12 +8,12 @@ using SocialMediaAgent.Repositories.Interfaces;
 namespace SocialMediaAgent.Utils{
     public class CommandPallete{
 
-        public static Dictionary<string, Func<IGroqService?, HttpClient, TelexRequest?, Task<bool>>> Commands = new()
+        public static Dictionary<string, Func<string ,IGroqService?, HttpClient, TelexRequest?, Task<bool>>> Commands = new()
         {
             {"/generate-post", GeneratePost},
             {"/commands", SendCommands}
         };
-        public static async Task<bool> GeneratePost(IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
+        public static async Task<bool> GeneratePost(string telexPingUrl, IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
         {
             try{
                 var platform = telexRequest!.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
@@ -37,7 +37,7 @@ namespace SocialMediaAgent.Utils{
                 telexMessageResponse.message = $"{groqResponse}\n\n #️⃣SocialMediaAgent";
                 telexMessageResponse.status = "success";
 
-                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var webhookUrl = telexPingUrl + telexRequest.channel_id;
                 var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return clientResponse.IsSuccessStatusCode ? true : false;
                 
@@ -49,7 +49,7 @@ namespace SocialMediaAgent.Utils{
             
         }
 
-        public static async Task<bool> SendErrorMessage(IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
+        public static async Task<bool> SendErrorMessage(string telexPingUrl,IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
         {
             try{
                 TelexMessageResponse telexMessageResponse = new(){
@@ -57,7 +57,7 @@ namespace SocialMediaAgent.Utils{
                     message = telexRequest!.Message,
                     status = "error"
                 };
-                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var webhookUrl = telexPingUrl + telexRequest.channel_id;
                 var clientResponse = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return clientResponse.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)
@@ -66,7 +66,7 @@ namespace SocialMediaAgent.Utils{
                 return false;
             }
         }
-        public static async Task<bool> SendCommands(IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
+        public static async Task<bool> SendCommands(string telexPingUrl, IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
         {
             try{
                 TelexMessageResponse telexMessageResponse = new(){
@@ -79,7 +79,7 @@ namespace SocialMediaAgent.Utils{
                     status = "success"
                 };
 
-                var webhookUrl = telexRequest.Settings.First().Default + telexRequest.channel_id;
+                var webhookUrl = telexPingUrl + telexRequest.channel_id;
                 var response = await Client.PostToTelex(httpClient, telexMessageResponse, webhookUrl);
                 return response.IsSuccessStatusCode ? true : false;
             }catch(Exception ex)

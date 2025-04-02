@@ -64,7 +64,6 @@ namespace SocialMediaAgent.Repositories.Implementation
             }
 
             // var channelUrl = telexRequest?.channel_id ?? "0195dc8e-131b-7874-a3b6-a343cc0332f7";
-            telexRequest.Settings.First().Default = _telexPingUrl;
 
             var trimmedMessasge = RemoveTags(telexRequest.Message);
             var splittedMessage = trimmedMessasge.Split(' ', 2);
@@ -79,22 +78,18 @@ namespace SocialMediaAgent.Repositories.Implementation
                     telexRequest.Message = @"Hello, keyword command not specified.
                     type /commands to see the list of avaliable commands. #️⃣SocialMediaAgent";
 
-                    var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
+                    var response = await CommandPallete.SendErrorMessage(_telexPingUrl, _groqService, _httpClient, telexRequest);
                     CustomLogger.WriteToFile("Command not selected ", telexRequest);
                     return response;
                 }
 
                 var platform = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
-                // var tone = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "tone")?.Default ?? "neutral";
-                // var style = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "style")?.Default ?? "standard";
-                // var audience = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "audience")?.Default ?? "general";
-                // var postPurpose = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "postpurpose")?.Default ?? "informational";
 
                 if (string.IsNullOrEmpty(platform))
                 {
                     telexRequest.Settings.First().Label = "Platform Selection Needed";
                     telexRequest.Message = "To continue, please go to the app's settings and select a platform (Twitter, Instagram, LinkedIn, Facebook, Discord or TikTok) for your post formatting. Once you've selected a platform, we can tailor the content accordingly.\n\n #️⃣SocialMediaAgent";
-                    var response = await CommandPallete.SendErrorMessage( _groqService, _httpClient, telexRequest);
+                    var response = await CommandPallete.SendErrorMessage(_telexPingUrl, _groqService, _httpClient, telexRequest);
 
                     CustomLogger.WriteToFile("platform not selceted", new TelexRequest
                     {
@@ -115,7 +110,7 @@ namespace SocialMediaAgent.Repositories.Implementation
                     return response;
                 }
 
-                var _isSuccessful = await function(_groqService, _httpClient, telexRequest);                
+                var _isSuccessful = await function(_telexPingUrl, _groqService, _httpClient, telexRequest);                
                 return _isSuccessful;
             }
             catch (Exception ex)
