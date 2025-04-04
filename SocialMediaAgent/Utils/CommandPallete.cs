@@ -10,8 +10,8 @@ namespace SocialMediaAgent.Utils{
 
         public static Dictionary<string, Func<string ,IGroqService?, HttpClient, TelexRequest?, Task<bool>>> Commands = new()
         {
-            {"/generate-post", GeneratePost},
-            {"/commands", SendCommands}
+            {"generate", GeneratePost},
+            {"commands", SendCommands}
         };
         public static async Task<bool> GeneratePost(string telexPingUrl, IGroqService? groqService, HttpClient httpClient, TelexRequest? telexRequest)
         {
