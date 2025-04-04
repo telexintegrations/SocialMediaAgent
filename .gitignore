@@ -365,3 +365,5 @@ FodyWeavers.xsd
 #custom files & folders
 brainstorm.md
 */published
+temp_auto_push.bat
+temp_interactive_push.bat

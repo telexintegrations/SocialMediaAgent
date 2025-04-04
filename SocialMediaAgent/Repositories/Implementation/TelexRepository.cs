@@ -56,32 +56,15 @@ namespace SocialMediaAgent.Repositories.Implementation
             }
         }
 
-        public async Task<bool> BingTelex(TelexRequest telexRequest)
+        public async Task<bool> BingTelex(Func<string, IGroqService?, HttpClient, TelexRequest?, Task<bool>> function, TelexRequest telexRequest)
         {
             if (telexRequest == null || string.IsNullOrEmpty(telexRequest.Message))
             {
                 return false;
             }
-
-            // var channelUrl = telexRequest?.channel_id ?? "0195dc8e-131b-7874-a3b6-a343cc0332f7";
-
-            var trimmedMessasge = RemoveTags(telexRequest.Message);
-            var splittedMessage = trimmedMessasge.Split(' ', 2);
-            string cmd = splittedMessage.First();
             try
             {
                 CustomLogger.WriteToFile("Telex call to api with request ",telexRequest);
-
-                if(CommandPallete.Commands.TryGetValue(cmd, out var function) == false)
-                {
-                    telexRequest.Settings.First().Label = "Command needed";
-                    telexRequest.Message = @"Hello, keyword command not specified.
-                    type /commands to see the list of avaliable commands. #️⃣SocialMediaAgent";
-
-                    var response = await CommandPallete.SendErrorMessage(_telexPingUrl, _groqService, _httpClient, telexRequest);
-                    CustomLogger.WriteToFile("Command not selected ", telexRequest);
-                    return response;
-                }
 
                 var platform = telexRequest.Settings.FirstOrDefault(x => x.Label.ToLower() == "platform")?.Default;
 
@@ -123,10 +106,13 @@ namespace SocialMediaAgent.Repositories.Implementation
         public async Task<bool> RoutePrompt(TelexRequest telexRequest)
         {
             var trimmedMessasge = RemoveTags(telexRequest.Message);
-            CustomLogger.WriteToFile($"this is the channeID:: '{telexRequest.channel_id}'",telexRequest);
-            if(CommandPallete.Commands.Keys.Any(trimmedMessasge.Contains))
+            var splittedMessage = trimmedMessasge.Split(' ', 2);
+            string cmd = splittedMessage.First();
+
+            CustomLogger.WriteToFile($"Trace request:: '{telexRequest.channel_id}'",telexRequest);
+            if(CommandPallete.Commands.TryGetValue(cmd, out var function) == true)
             {
-                var bingReponse = await BingTelex(telexRequest);
+                var bingReponse = await BingTelex(function, telexRequest);
                 return bingReponse;                
             }
             
